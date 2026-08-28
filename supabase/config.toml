@@ -1,0 +1,13 @@
+project_id = "camara-fria"
+
+[api]
+enabled = true
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[realtime]
+enabled = true

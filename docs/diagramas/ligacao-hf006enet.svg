@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+  <rect width="1800" height="1100" fill="#07151f"/>
+  <style>
+    text{font-family:Arial,sans-serif;fill:#edf8fa}.title{font-size:34px;font-weight:700}.sub{font-size:18px;fill:#a9c4ce}.section{font-size:19px;font-weight:700;letter-spacing:1.5px;fill:#60dff0}.box{fill:#0c2835;stroke:#38d1eb;stroke-width:2}.device{fill:#102f3c;stroke:#65dfed;stroke-width:2}.warn{fill:#3c260e;stroke:#f0b73b;stroke-width:2}.danger{fill:#3a181c;stroke:#fa796d;stroke-width:2}.pin{font-size:17px;font-family:monospace}.note{font-size:15px;fill:#c0d1d7}.tiny{font-size:13px;fill:#b8ccd2}.power{stroke:#f6b83d;stroke-width:5;fill:none}.gnd{stroke:#a9bbc1;stroke-width:4;fill:none}.eth{stroke:#8d74ff;stroke-width:5;fill:none}.a{stroke:#49d7ef;stroke-width:5;fill:none}.b{stroke:#f2ca45;stroke-width:5;fill:none}.signal{stroke:#59e6bd;stroke-width:4;fill:none}.alarm{stroke:#ff7d72;stroke-width:4;fill:none}.dash{stroke-dasharray:10 7}
+  </style>
+  <text x="55" y="55" class="title">Camara Fria — diagrama unifilar HF-006Enet</text>
+  <text x="55" y="86" class="sub">Leitura Modbus somente. Cada linha representa um condutor. Nao energizar antes de conferir os bornes no equipamento.</text>
+
+  <text x="55" y="142" class="section">1. ALIMENTACAO E REDE</text>
+  <rect x="55" y="165" width="350" height="180" rx="18" class="warn"/>
+  <text x="135" y="210" class="title">Fonte 12/24 Vcc</text>
+  <text x="90" y="258" class="pin">+V  ────────────────────── (P1)</text>
+  <text x="90" y="294" class="pin">0V  ────────────────────── (P2)</text>
+  <text x="90" y="325" class="tiny">Fusivel e protecao conforme painel</text>
+  <rect x="615" y="150" width="580" height="350" rx="22" class="device"/>
+  <text x="760" y="200" class="title">Hoffer PLC HF-006Enet</text>
+  <text x="665" y="248" class="pin">ALIMENTACAO +V  &lt;── (P1)</text>
+  <text x="665" y="285" class="pin">ALIMENTACAO 0V  &lt;── (P2)</text>
+  <text x="665" y="332" class="pin">RJ45 Ethernet  ── (N1)</text>
+  <text x="665" y="379" class="pin">RS-485 A       ── (R1)</text>
+  <text x="665" y="414" class="pin">RS-485 B       ── (R2)</text>
+  <text x="665" y="459" class="note">UART0/RS-485: usar somente RS-485; serial TTL desligada.</text>
+  <path d="M405 258H615" class="power"/><path d="M405 294H615" class="gnd"/>
+  <rect x="1375" y="165" width="370" height="180" rx="18" class="box"/>
+  <text x="1465" y="210" class="title">Rede Ethernet</text>
+  <text x="1410" y="258" class="pin">Switch / Roteador</text>
+  <text x="1410" y="294" class="pin">API - Supabase - Dashboard</text>
+  <text x="1410" y="325" class="tiny">Cabo RJ45 da HF-006Enet</text>
+  <path d="M1195 332H1375" class="eth"/>
+
+  <text x="55" y="555" class="section">2. BARRAMENTO RS-485 MODBUS RTU — TOPOLOGIA EM LINHA</text>
+  <rect x="55" y="585" width="315" height="270" rx="18" class="device"/>
+  <text x="125" y="630" class="title">HF-006Enet</text>
+  <text x="90" y="680" class="pin">A (+) ─── (R1)</text>
+  <text x="90" y="720" class="pin">B (-) ─── (R2)</text>
+  <text x="90" y="770" class="note">Mestre Modbus RTU</text>
+  <text x="90" y="805" class="tiny">Confirmar se a terminacao interna esta ativa.</text>
+  <rect x="735" y="585" width="340" height="270" rx="18" class="box"/>
+  <text x="825" y="630" class="title">Controlador TC300</text>
+  <text x="770" y="680" class="pin">A (+) &lt;── (R1) ── A segue</text>
+  <text x="770" y="720" class="pin">B (-) &lt;── (R2) ── B segue</text>
+  <text x="770" y="770" class="note">Escravo Modbus: endereco pendente</text>
+  <text x="770" y="805" class="tiny">Baud/paridade devem ser iguais aos do inversor.</text>
+  <rect x="1400" y="585" width="345" height="270" rx="18" class="box"/>
+  <text x="1462" y="630" class="title">CLP / Inversor</text>
+  <text x="1435" y="680" class="pin">A (+) &lt;── (R1)</text>
+  <text x="1435" y="720" class="pin">B (-) &lt;── (R2)</text>
+  <text x="1435" y="770" class="note">Escravo Modbus: endereco pendente</text>
+  <text x="1435" y="805" class="tiny">Terminar em 120 ohms somente se necessario.</text>
+  <path d="M370 680H735M1075 680H1400" class="a"/><path d="M370 720H735M1075 720H1400" class="b"/>
+  <rect x="405" y="632" width="145" height="46" rx="8" fill="#143b49" stroke="#49d7ef"/><text x="423" y="662" class="tiny">R1: A(+) para A(+)</text>
+  <rect x="405" y="727" width="145" height="46" rx="8" fill="#44380d" stroke="#f2ca45"/><text x="423" y="757" class="tiny">R2: B(-) para B(-)</text>
+  <rect x="1130" y="632" width="145" height="46" rx="8" fill="#143b49" stroke="#49d7ef"/><text x="1148" y="662" class="tiny">R1: A(+) para A(+)</text>
+  <rect x="1130" y="727" width="145" height="46" rx="8" fill="#44380d" stroke="#f2ca45"/><text x="1148" y="757" class="tiny">R2: B(-) para B(-)</text>
+  <text x="70" y="890" class="note">Nao usar estrela. Se um equipamento marcar D+/D- ou 485+/485-, confirmar a equivalencia A/B no manual dele antes de conectar.</text>
+
+  <text x="55" y="950" class="section">3. PORTA E ALARME LOCAL</text>
+  <rect x="55" y="972" width="500" height="100" rx="16" class="box"/>
+  <text x="83" y="1011" class="pin">ED1 + RETORNO  ── interruptor da porta (contato seco)</text>
+  <text x="83" y="1044" class="tiny">Confirmar polaridade e borne de retorno pelo manual/placa antes da ligacao.</text>
+  <rect x="680" y="972" width="500" height="100" rx="16" class="danger"/>
+  <text x="710" y="1011" class="pin">SD1: C + NA  ── fonte do buzzer ── buzzer externo</text>
+  <text x="710" y="1044" class="tiny">Relé 1 somente com carga e fonte compatíveis com o buzzer.</text>
+  <rect x="1300" y="972" width="445" height="100" rx="16" fill="#102b37" stroke="#61dabe" stroke-width="2"/>
+  <text x="1330" y="1011" class="pin">REGRA DE BARRAMENTO</text>
+  <text x="1330" y="1044" class="tiny">TC300 e inversor no mesmo barramento apenas se baud, paridade e stop bits coincidirem.</text>
+</svg>
