@@ -1,3 +1,5 @@
 # Diagramas
 
-Os diagramas de ligacao serao criados novamente apos a validacao do manual e dos bornes da Hoffer PLC HF-006Enet.
+- ligacao-hf006enet-tc300.svg/png: fase atual, somente HF-006Enet e TC300.
+
+O diagrama do inversor sera criado em fase futura.

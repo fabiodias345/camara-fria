@@ -1,21 +1,14 @@
-# Ligação de campo — HF-006Enet
+# Ligação de campo — fase TC300
 
-![Diagrama unifilar](diagramas/ligacao-hf006enet.png)
+O diagrama atual considera somente a HF-006Enet, o controlador TC300, o interruptor da porta e o buzzer externo.
 
-## Sequência de montagem
+## Sequência
 
-1. Com tudo desligado, alimente a HF-006Enet com fonte 12 ou 24 Vcc, conforme o borne marcado na placa.
-2. Ligue o cabo RJ45 da placa ao switch ou roteador.
-3. Monte um único barramento RS-485: HF-006Enet -> TC300 -> CLP/inversor. Não use topologia em estrela.
-4. Ligue A da placa ao A do TC300 e siga para A do inversor; repita B para B. Confirme a nomenclatura de cada equipamento antes de apertar os bornes.
-5. Use o mesmo barramento somente se TC300 e inversor aceitarem a mesma configuração serial. Caso contrário, manteremos um segundo adaptador RS-485 isolado.
-6. Ligue o interruptor da porta na ED1 e no borne de retorno correspondente.
-7. Ligue o buzzer externo pela saída SD1, usando os contatos C e NA do relé e fonte compatível com a carga.
+1. Com tudo desligado, alimente a HF-006Enet com 12 ou 24 Vcc conforme o manual.
+2. Configure a HF-006Enet para Wi-Fi ou conecte o cabo Ethernet.
+3. Ligue o RS-485 da HF-006Enet ao TC300: A (+) com A (+) e B (-) com B (-), confirmando a marcação do TC300.
+4. Configure o endereço e os parâmetros Modbus do TC300 somente após confirmar o manual do equipamento.
+5. Ligue o interruptor da porta na ED1 e no retorno correspondente.
+6. Ligue o buzzer externo pelos contatos C e NA do Relé 1, com fonte compatível.
 
-## Pendências de comissionamento
-
-- Modelo, endereço Modbus, baud rate, paridade e stop bits do TC300.
-- Modelo, endereço Modbus, baud rate, paridade e stop bits do CLP/inversor.
-- Equivalência A/B ou D+/D- em ambos os equipamentos.
-- Necessidade e posição da terminação de 120 ohms.
-- Polaridade da ED1 e tensão/corrente do buzzer externo.
+O inversor/CLP não deve ser ligado nesta fase.

@@ -1,13 +1,14 @@
-# Testes de entrada e saida
+# Testes de entrada e saída — fase TC300
 
 | ID | Tipo | Procedimento | Resultado esperado | Status |
 |---|---|---|---|---|
-| IN-01 | RS-485 inversor | Ler registro conhecido | Valor e escala corretos | Pendente |
-| IN-02 | RS-485 TC300 | Ler temperatura/umidade | Valores coerentes | Pendente |
-| IN-03 | Entrada digital da HF-006Enet | Abrir/fechar a porta | Transicao sem falsos eventos | Pendente |
-| IN-04 | Falha serial | Remover cabo ou mudar endereco | Offline e alarme registrados | Pendente |
-| OUT-01 | Alarme da HF-006Enet | Simular 5, 6 e 7 minutos | Aviso, intervalo e continuo | Pendente |
-| OUT-02 | Supabase | Inserir telemetria | Dashboard recebe via Realtime | Pendente |
-| OUT-03 | WhatsApp | Acionar alarme de temperatura | Mensagem enviada ou erro auditado | Pendente |
+| IN-01 | RS-485 TC300 | Ler temperatura, umidade e setpoint conhecidos | Valores e escalas corretos | Pendente |
+| IN-02 | Alarmes TC300 | Simular ou registrar estado de alarme | Código e estado preservados | Pendente |
+| IN-03 | Entrada ED1 | Abrir/fechar a porta | Transição sem falsos eventos | Pendente |
+| IN-04 | Falha serial | Remover cabo ou alterar endereço | TC300 offline e evento registrado | Pendente |
+| OUT-01 | Relé 1 / buzzer | Simular 5, 6 e 7 minutos | Aviso, intervalo de 10 s e contínuo | Pendente |
+| OUT-02 | Wi-Fi | Desconectar e reconectar a rede | Fila local e reconexão | Pendente |
+| OUT-03 | Supabase | Inserir telemetria do TC300 | Dashboard recebe via Realtime | Pendente |
+| OUT-04 | WhatsApp | Acionar temperatura acima do limite | Mensagem enviada ou erro auditado | Pendente |
 
-Cada execucao deve registrar data, operador, equipamento, configuracao, foto da ligacao e evidencia do resultado.
+O inversor/CLP terá checklist próprio quando entrar no escopo.
