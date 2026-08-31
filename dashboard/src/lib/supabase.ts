@@ -6,46 +6,73 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DR
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Edge Function URL
+const FUNCTIONS_URL = `${supabaseUrl}/functions/v1`
+
 export async function fetchLatestTelemetry() {
+  // Use the v_current_status view for consolidated data
   const { data, error } = await supabase
-    .from('telemetry_current')
+    .from('v_current_status')
     .select('*')
     .single()
   
   if (error) {
     console.error('Error fetching telemetry:', error)
-    return null
+    // Fallback to telemetry table
+    const { data: fallback } = await supabase
+      .from('telemetry')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .single()
+    return fallback
   }
   return data
 }
 
 export async function fetchTemperatureHistory(hours: number = 12) {
+  // Use the v_temperature_history view
   const { data, error } = await supabase
-    .from('telemetry')
-    .select('temperature, setpoint, timestamp')
+    .from('v_temperature_history')
+    .select('temperature, setpoint, humidity, timestamp')
     .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
     .order('timestamp', { ascending: true })
     .limit(200)
   
   if (error) {
     console.error('Error fetching history:', error)
-    return []
+    // Fallback to telemetry table
+    const { data: fallback } = await supabase
+      .from('telemetry')
+      .select('temperature, setpoint, humidity, timestamp')
+      .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
+      .order('timestamp', { ascending: true })
+      .limit(200)
+    return fallback || []
   }
-  return data
+  return data || []
 }
 
 export async function fetchAlerts() {
+  // Use the v_active_alerts view
   const { data, error } = await supabase
-    .from('alerts')
+    .from('v_active_alerts')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(10)
   
   if (error) {
     console.error('Error fetching alerts:', error)
-    return []
+    // Fallback to alerts table
+    const { data: fallback } = await supabase
+      .from('alerts')
+      .select('*')
+      .eq('acknowledged', false)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    return fallback || []
   }
-  return data
+  return data || []
 }
 
 export async function fetchDevices() {
@@ -57,7 +84,39 @@ export async function fetchDevices() {
     console.error('Error fetching devices:', error)
     return []
   }
-  return data
+  return data || []
+}
+
+// Call Edge Function to check alerts (server-side logic)
+export async function checkAlerts() {
+  try {
+    const response = await fetch(`${FUNCTIONS_URL}/check-alerts`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    })
+    return await response.json()
+  } catch (error) {
+    console.error('Error calling check-alerts:', error)
+    return null
+  }
+}
+
+// Call Edge Function to get consolidated status
+export async function getStatus() {
+  try {
+    const response = await fetch(`${FUNCTIONS_URL}/get-status`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    })
+    return await response.json()
+  } catch (error) {
+    console.error('Error calling get-status:', error)
+    return null
+  }
 }
 
 export function subscribeToTelemetry(callback: (payload: any) => void) {

@@ -49,7 +49,7 @@ bool ApiClient::sendTelemetry(const TelemetryPayload &payload) {
     // A verificação de link é feita no main.cpp antes de chamar esta função
     
     HTTPClient http;
-    String url = String("http://") + _host + ":" + String(_port) + _path;
+    String url = String("https://") + _host + _path;
     
     #if DEBUG_SERIAL
     Serial.printf("[API] POST %s\n", url.c_str());

@@ -40,7 +40,7 @@ export function App() {
       if (telemetry) {
         setData({
           temperature: telemetry.temperature ?? -18.4,
-          humidity: telemetry.heater_output ?? 45,
+          humidity: telemetry.humidity ?? telemetry.heater_output ?? 45,
           setpoint: telemetry.setpoint ?? -18,
           voltage: telemetry.inverter_voltage ?? 380,
           current: telemetry.inverter_current ?? 12.8,
@@ -49,7 +49,7 @@ export function App() {
           doorMinutes: telemetry.door_open_seconds ? Math.floor(telemetry.door_open_seconds / 60) : 0,
           inverterOnline: telemetry.inverter_running ?? true,
           tc300Online: true,
-          buzzer: (telemetry.door_stage ?? 0) > 0,
+          buzzer: telemetry.buzzer_active ?? (telemetry.door_stage ?? 0) > 0,
           lastSeen: 'agora'
         })
         setLastUpdate(new Date())

@@ -68,11 +68,12 @@
 #define TEMP_CRITICAL       12.0f   // Crítico (buzzer + WhatsApp)
 #define TEMP_POLL_INTERVAL_MS 5000  // Lê a cada 5 segundos
 
-// --- Supabase API ---
-#define SUPABASE_HOST       "192.168.1.50"  // IP do servidor Supabase
-#define SUPABASE_PORT       3010            // PostgREST API
-#define SUPABASE_API_PATH   "/telemetry"    // Endpoint direto PostgREST
-#define SUPABASE_ANON_KEY   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder-anon-key"
+// --- Supabase Cloud (Edge Functions) ---
+#define SUPABASE_HOST       "hnfdlpjkoxizrgukjcrw.supabase.co"
+#define SUPABASE_PORT       443
+#define SUPABASE_API_PATH   "/functions/v1/receive-telemetry"
+#define SUPABASE_ANON_KEY   "sb_publishable_DReGLMwglDMCB5DYoPcQwQ_3_gVWFui"
+#define SUPABASE_SSL        true
 
 // --- Intervalos ---
 #define TELEMETRY_SEND_MS   10000   // Envia dados a cada 10 segundos

@@ -1,12 +1,9 @@
 // ============================================
-// CÂMARA FRIA - Edge Function: Receive Telemetry
+// receive-telemetry Edge Function
+// Recebe dados do ESP32 e salva no Supabase
 // ============================================
-// Recebe dados de telemetria do ESP32 via HTTP POST
-// e armazena no banco de dados Supabase.
-// ============================================
-
-import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,114 +14,194 @@ const corsHeaders = {
 interface TelemetryData {
   device_id: string;
   temperature: number;
-  setpoint: number;
-  heater_output: number;
-  inverter_frequency: number;
-  inverter_voltage: number;
-  inverter_current: number;
-  inverter_dc_voltage: number;
-  inverter_temperature: number;
-  inverter_running: boolean;
-  inverter_fault_code: number;
-  door_open: boolean;
-  door_open_seconds: number;
-  door_stage: number;
-  timestamp: number;
+  setpoint?: number;
+  humidity?: number;
+  heater_output?: number;
+  inverter_frequency?: number;
+  inverter_voltage?: number;
+  inverter_current?: number;
+  inverter_dc_voltage?: number;
+  inverter_temperature?: number;
+  inverter_running?: boolean;
+  inverter_fault_code?: number;
+  door_open?: boolean;
+  door_open_seconds?: number;
+  door_stage?: number;
+  buzzer_active?: boolean;
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    // Create Supabase client with service role for full access
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse request body
-    const data: TelemetryData = await req.json();
-    
-    console.log(`[RECEIVE] Dados recebidos de ${data.device_id}:`);
-    console.log(`  Temp: ${data.temperature}°C | Setpoint: ${data.setpoint}°C`);
-    console.log(`  Inv: ${data.inverter_frequency}Hz | Porta: ${data.door_open ? "ABERTA" : "FECHADA"}`);
-
-    // Validate required fields
-    if (!data.device_id) {
+    if (req.method !== "POST") {
       return new Response(
-        JSON.stringify({ error: "device_id is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Upsert device if not exists
-    const { error: deviceError } = await supabase
-      .from("devices")
-      .upsert(
+        JSON.stringify({ error: "Method not allowed" }),
         {
-          device_id: data.device_id,
-          is_online: true,
-          last_seen: new Date().toISOString(),
-        },
-        { onConflict: "device_id" }
+          status: 405,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
       );
-
-    if (deviceError) {
-      console.error("[RECEIVE] Erro ao atualizar device:", deviceError);
     }
 
-    // Insert telemetry data
-    const { data: telemetryRecord, error: telemetryError } = await supabase
+    const body: TelemetryData = await req.json();
+
+    if (!body.device_id || body.temperature === undefined) {
+      return new Response(
+        JSON.stringify({
+          error: "Missing required fields: device_id, temperature",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Insert telemetry record
+    const { data: telemetry, error: telemetryError } = await supabase
       .from("telemetry")
       .insert({
-        device_id: data.device_id,
-        temperature: data.temperature,
-        setpoint: data.setpoint,
-        heater_output: data.heater_output,
-        inverter_frequency: data.inverter_frequency,
-        inverter_voltage: data.inverter_voltage,
-        inverter_current: data.inverter_current,
-        inverter_dc_voltage: data.inverter_dc_voltage,
-        inverter_temperature: data.inverter_temperature,
-        inverter_running: data.inverter_running,
-        inverter_fault_code: data.inverter_fault_code,
-        door_open: data.door_open,
-        door_open_seconds: data.door_open_seconds,
-        door_stage: data.door_stage,
-        timestamp: new Date().toISOString(),
-        raw_json: data as unknown as Record<string, unknown>,
+        device_id: body.device_id,
+        temperature: body.temperature,
+        setpoint: body.setpoint ?? -18.0,
+        heater_output: body.heater_output ?? 45.0,
+        inverter_frequency: body.inverter_frequency ?? null,
+        inverter_voltage: body.inverter_voltage ?? null,
+        inverter_current: body.inverter_current ?? null,
+        inverter_dc_voltage: body.inverter_dc_voltage ?? null,
+        inverter_temperature: body.inverter_temperature ?? null,
+        inverter_running: body.inverter_running ?? true,
+        inverter_fault_code: body.inverter_fault_code ?? 0,
+        humidity: body.humidity ?? null,
+        door_open: body.door_open ?? false,
+        door_open_seconds: body.door_open_seconds ?? 0,
+        door_stage: body.door_stage ?? 0,
+        buzzer_active: body.buzzer_active ?? false,
       })
-      .select("id")
+      .select()
       .single();
 
     if (telemetryError) {
-      console.error("[RECEIVE] Erro ao inserir telemetria:", telemetryError);
+      console.error("Telemetry insert error:", telemetryError);
       return new Response(
-        JSON.stringify({ error: "Failed to store telemetry", details: telemetryError }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: telemetryError.message }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
       );
     }
 
-    console.log(`[RECEIVE] Telemetria salva com ID: ${telemetryRecord?.id}`);
+    // Check for alerts
+    const alerts: Array<{
+      device_id: string;
+      alert_type: string;
+      message: string;
+      severity: string;
+    }> = [];
 
-    // Check for new alerts that were auto-created by triggers
-    const { data: newAlerts } = await supabase
-      .from("alerts")
-      .select("id, alert_type, severity, message")
-      .eq("device_id", data.device_id)
-      .eq("acknowledged", false)
-      .order("created_at", { ascending: false })
-      .limit(5);
+    // Temperature alert
+    if (body.temperature > -8.0) {
+      alerts.push({
+        device_id: body.device_id,
+        alert_type: "high_temperature",
+        message: `Temperatura alta: ${body.temperature.toFixed(1)}°C (limite: -8.0°C)`,
+        severity: body.temperature > 0 ? "critical" : "warning",
+      });
+    }
 
-    // Return success with any new alerts
+    // Door open alert
+    if (body.door_open_seconds && body.door_open_seconds >= 300) {
+      const minutes = Math.floor(body.door_open_seconds / 60);
+      alerts.push({
+        device_id: body.device_id,
+        alert_type: "door_open",
+        message: `Porta aberta ha ${minutes} minutos`,
+        severity: body.door_open_seconds >= 420 ? "critical" : "warning",
+      });
+    }
+
+    // Inverter fault
+    if (
+      body.inverter_frequency !== undefined &&
+      body.inverter_frequency === 0 &&
+      body.temperature > -15.0
+    ) {
+      alerts.push({
+        device_id: body.device_id,
+        alert_type: "inverter_fault",
+        message: `Inversor parado! Temperatura subindo: ${body.temperature.toFixed(1)}°C`,
+        severity: "critical",
+      });
+    }
+
+    // Insert alerts (deduplicate: only unacknowledged alerts per type per device)
+    for (const alert of alerts) {
+      const { data: existing } = await supabase
+        .from("alerts")
+        .select("id")
+        .eq("device_id", alert.device_id)
+        .eq("alert_type", alert.alert_type)
+        .eq("acknowledged", false)
+        .limit(1);
+
+      if (!existing || existing.length === 0) {
+        await supabase.from("alerts").insert(alert);
+      }
+    }
+
+    // Acknowledge alerts that are no longer active
+    if (body.temperature <= -8.0) {
+      await supabase
+        .from("alerts")
+        .update({
+          acknowledged: true,
+          acknowledged_at: new Date().toISOString(),
+          acknowledged_by: "system",
+        })
+        .eq("device_id", body.device_id)
+        .eq("alert_type", "high_temperature")
+        .eq("acknowledged", false);
+    }
+
+    if (!body.door_open_seconds || body.door_open_seconds === 0) {
+      await supabase
+        .from("alerts")
+        .update({
+          acknowledged: true,
+          acknowledged_at: new Date().toISOString(),
+          acknowledged_by: "system",
+        })
+        .eq("device_id", body.device_id)
+        .eq("alert_type", "door_open")
+        .eq("acknowledged", false);
+    }
+
+    if (body.inverter_frequency && body.inverter_frequency > 0) {
+      await supabase
+        .from("alerts")
+        .update({
+          acknowledged: true,
+          acknowledged_at: new Date().toISOString(),
+          acknowledged_by: "system",
+        })
+        .eq("device_id", body.device_id)
+        .eq("alert_type", "inverter_fault")
+        .eq("acknowledged", false);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
-        telemetry_id: telemetryRecord?.id,
-        new_alerts: newAlerts || [],
+        telemetry_id: telemetry?.id,
+        alerts_created: alerts.length,
       }),
       {
         status: 200,
@@ -132,7 +209,7 @@ serve(async (req: Request) => {
       }
     );
   } catch (error) {
-    console.error("[RECEIVE] Erro geral:", error);
+    console.error("Unexpected error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       {
