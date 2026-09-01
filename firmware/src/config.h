@@ -4,6 +4,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#if __has_include("wifi_secrets.h")
+#include "wifi_secrets.h"
+#else
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+#endif
+
 // =============================================
 // PLACA: HF-006Enet (Hoffer Automação)
 // ESP32 Dual-Core + W5500 Ethernet (HSPI)

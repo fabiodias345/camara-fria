@@ -30,3 +30,4 @@ Thumbs.db
 
 # Docker volumes
 docker-data/
+firmware/src/wifi_secrets.h

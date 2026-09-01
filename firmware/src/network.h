@@ -25,7 +25,8 @@ public:
 
 private:
     byte _mac[6];
-    bool _initialized;
+    bool _ethernet_initialized;
+    unsigned long _last_wifi_attempt;
 };
 
 #endif // NETWORK_H
