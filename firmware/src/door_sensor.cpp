@@ -15,7 +15,7 @@ DoorSensor::DoorSensor() : _state{}, _last_raw_state(false), _last_debounce(0) {
 }
 
 void DoorSensor::begin() {
-    // EN7 é optoacoplada: com o LED da entrada ligado, o GPIO fica em LOW.
+    // EN7 é optoacoplada: nesta placa, o LED da entrada ligado resulta em GPIO HIGH.
     pinMode(DOOR_SENSOR_PIN, INPUT_PULLUP);
 
     _last_raw_state = digitalRead(DOOR_SENSOR_PIN);
