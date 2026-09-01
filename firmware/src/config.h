@@ -48,8 +48,8 @@
 
 // --- Entradas Digitais (optoacopladas 12/24V) ---
 #define DEVICE_ID           "camara-fria-01"
-#define DOOR_SENSOR_PIN     27      // EN7 (GPIO27) - Reed Switch da porta
-#define DOOR_INPUT_ACTIVE_LOW false  // EN7 energizada: GPIO em HIGH
+#define DOOR_SENSOR_PIN     36      // EN1 (GPIO36) - Sensor da porta
+#define DOOR_INPUT_ACTIVE_LOW true   // EN1 ligada = ON/porta aberta; desligada = OFF/fechada
 #define DOOR_DEBOUNCE_MS    500     // Debounce 500ms
 #define DOOR_OPEN_WARN_S    300     // 5 minutos = aviso (1 pulso)
 #define DOOR_OPEN_PULSE_S   360     // 6 minutos = pulsos a cada 10s

@@ -15,15 +15,15 @@ DoorSensor::DoorSensor() : _state{}, _last_raw_state(false), _last_debounce(0) {
 }
 
 void DoorSensor::begin() {
-    // EN7 é optoacoplada: nesta placa, o LED da entrada ligado resulta em GPIO HIGH.
-    pinMode(DOOR_SENSOR_PIN, INPUT_PULLUP);
+    // EN1 é optoacoplada: ligada = GPIO LOW (ON); desligada = GPIO HIGH (OFF).
+    pinMode(DOOR_SENSOR_PIN, INPUT);
 
     _last_raw_state = digitalRead(DOOR_SENSOR_PIN);
     _last_debounce = millis();
     setDoorState(isDoorOpen(_last_raw_state));
 
     #if DEBUG_SERIAL
-    Serial.printf("[DOOR] HF-006Enet - EN7 (GPIO%d) inicializado\n", DOOR_SENSOR_PIN);
+    Serial.printf("[DOOR] HF-006Enet - EN1 (GPIO%d) inicializado\n", DOOR_SENSOR_PIN);
     Serial.printf("[DOOR] Estado inicial: %s\n", _state.is_open ? "ABERTA" : "FECHADA");
     #endif
 }
