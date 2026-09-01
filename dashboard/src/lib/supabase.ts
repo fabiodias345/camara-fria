@@ -36,7 +36,7 @@ export async function fetchTemperatureHistory(hours: number = 12) {
     .from('v_temperature_history')
     .select('temperature, setpoint, humidity, timestamp')
     .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
-    .order('timestamp', { ascending: true })
+    .order('timestamp', { ascending: false })
     .limit(200)
   
   if (error) {
@@ -46,11 +46,11 @@ export async function fetchTemperatureHistory(hours: number = 12) {
       .from('telemetry')
       .select('temperature, setpoint, humidity, timestamp')
       .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
-      .order('timestamp', { ascending: true })
+      .order('timestamp', { ascending: false })
       .limit(200)
-    return fallback || []
+    return fallback?.reverse() || []
   }
-  return data || []
+  return data?.reverse() || []
 }
 
 export async function fetchAlerts() {
@@ -70,9 +70,9 @@ export async function fetchAlerts() {
       .eq('acknowledged', false)
       .order('created_at', { ascending: false })
       .limit(10)
-    return fallback || []
+    return fallback?.reverse() || []
   }
-  return data || []
+  return data?.reverse() || []
 }
 
 export async function fetchDevices() {
@@ -84,7 +84,7 @@ export async function fetchDevices() {
     console.error('Error fetching devices:', error)
     return []
   }
-  return data || []
+  return data?.reverse() || []
 }
 
 // Call Edge Function to check alerts (server-side logic)
