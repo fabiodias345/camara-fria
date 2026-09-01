@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 // Supabase Cloud credentials
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://hnfdlpjkoxizrgukjcrw.supabase.co'
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DReGLMwglDMCB5DYoPcQwQ_3_gVWFui'
+const deviceId = 'camara-fria-01'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -14,6 +15,7 @@ export async function fetchLatestTelemetry() {
   const { data, error } = await supabase
     .from('v_current_status')
     .select('*')
+    .eq('device_id', deviceId)
     .single()
   
   if (error) {
@@ -22,6 +24,7 @@ export async function fetchLatestTelemetry() {
     const { data: fallback } = await supabase
       .from('telemetry')
       .select('*')
+      .eq('device_id', deviceId)
       .order('timestamp', { ascending: false })
       .limit(1)
       .single()
@@ -35,6 +38,7 @@ export async function fetchTemperatureHistory(hours: number = 12) {
   const { data, error } = await supabase
     .from('v_temperature_history')
     .select('temperature, setpoint, humidity, timestamp')
+    .eq('device_id', deviceId)
     .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
     .order('timestamp', { ascending: false })
     .limit(200)
@@ -45,6 +49,7 @@ export async function fetchTemperatureHistory(hours: number = 12) {
     const { data: fallback } = await supabase
       .from('telemetry')
       .select('temperature, setpoint, humidity, timestamp')
+      .eq('device_id', deviceId)
       .gte('timestamp', new Date(Date.now() - hours * 60 * 60 * 1000).toISOString())
       .order('timestamp', { ascending: false })
       .limit(200)
@@ -58,6 +63,7 @@ export async function fetchAlerts() {
   const { data, error } = await supabase
     .from('v_active_alerts')
     .select('*')
+    .eq('device_id', deviceId)
     .order('created_at', { ascending: false })
     .limit(10)
   
@@ -67,6 +73,7 @@ export async function fetchAlerts() {
     const { data: fallback } = await supabase
       .from('alerts')
       .select('*')
+      .eq('device_id', deviceId)
       .eq('acknowledged', false)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -122,6 +129,6 @@ export async function getStatus() {
 export function subscribeToTelemetry(callback: (payload: any) => void) {
   return supabase
     .channel('telemetry-changes')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'telemetry' }, callback)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'telemetry', filter: `device_id=eq.${deviceId}` }, callback)
     .subscribe()
 }

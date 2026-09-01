@@ -40,7 +40,9 @@
 #define INVERTER_SLAVE_ID       2   // Inversor de Frequência (WEG CFW500)
 
 // --- Entradas Digitais (optoacopladas 12/24V) ---
+#define DEVICE_ID           "camara-fria-01"
 #define DOOR_SENSOR_PIN     27      // EN7 (GPIO27) - Reed Switch da porta
+#define DOOR_INPUT_ACTIVE_LOW true   // Opto ativo: LED EN7 ligado = GPIO em LOW
 #define DOOR_DEBOUNCE_MS    500     // Debounce 500ms
 #define DOOR_OPEN_WARN_S    300     // 5 minutos = aviso (1 pulso)
 #define DOOR_OPEN_PULSE_S   360     // 6 minutos = pulsos a cada 10s

@@ -49,6 +49,8 @@ private:
     bool _last_raw_state;
     unsigned long _last_debounce;
     
+    bool isDoorOpen(bool raw_state) const;
+    void setDoorState(bool is_open);
     void updateStage();
 };
 

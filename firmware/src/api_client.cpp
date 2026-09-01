@@ -37,7 +37,7 @@ String ApiClient::buildJson(const TelemetryPayload &payload) {
     doc["door_open_seconds"] = payload.door_open_seconds;
     doc["door_stage"] = (int)payload.door_stage;
     doc["timestamp"] = millis();
-    doc["device_id"] = "esp32-camara-fria-01";
+    doc["device_id"] = DEVICE_ID;
     
     String output;
     serializeJson(doc, output);
